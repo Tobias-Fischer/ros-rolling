@@ -22,6 +22,10 @@ assimp:
   robostack: [assimp]
 assimp-dev:
   robostack: [assimp]
+autoconf:
+  robostack: [autoconf]
+automake:
+  robostack: [automake]
 avahi-daemon:
   robostack: [python-avahi]
 benchmark:
@@ -45,11 +49,6 @@ ca-certificates:
   robostack: [ca-certificates]
 cargo:
   robostack: [rust]
-chrony:
-  robostack:
-    linux: [chrony]
-    osx: [chrony]
-    win64: []
 clang-format:
   robostack: [clang-format]
 clang-tidy:
@@ -88,7 +87,7 @@ doxygen:
 draco:
   robostack: [draco]
 eigen:
-  robostack: [eigen]
+  robostack: [eigen, eigen-abi-devel]
 emacs:
   robostack: [emacs]
 festival:
@@ -178,7 +177,10 @@ ignition-gazebo3:
 ignition-gazebo5:
   robostack: [libignition-gazebo5]
 ignition-gazebo6:
-  robostack: [libignition-gazebo6]
+  robostack:
+    linux: [libignition-gazebo6, libgl-devel]
+    osx: [libignition-gazebo6]
+    win64: [libignition-gazebo6]
 ignition-gui5:
   robostack: [libignition-gui5]
 ignition-gui6:
@@ -554,6 +556,8 @@ libqt6opengl6t64:
     linux: [qt6-main, libopengl-devel, libgl-devel]
     osx: [qt6-main]
     win64: [qt6-main]
+libqt6statemachine6:
+  robostack: [qt6-scxml]
 libqt6svg6:
   robostack:
     linux: [qt6-main, libopengl-devel, libgl-devel]
@@ -839,7 +843,7 @@ python-pydot:
 python-pygithub3:
   robostack: [pygithub]
 python-pygraphviz:
-  robostack: [pygraphviz]
+  robostack: [graphviz, pygraphviz]
 python-pyusb-pip:
   robostack: [pyusb]
 python-qt5-bindings:
@@ -1038,7 +1042,7 @@ python3-pydantic:
 python3-pydot:
   robostack: [pydot]
 python3-pygraphviz:
-  robostack: [pygraphviz]
+  robostack: [graphviz, pygraphviz]
 python3-pykdl:
   robostack: [python-orocos-kdl]
 python3-pymongo:
@@ -1127,6 +1131,8 @@ python3-twisted:
   robostack: [twisted]
 python3-typeguard:
   robostack: [typeguard]
+python3-typing-extensions:
+  robostack: [typing_extensions]
 python3-ujson:
   robostack: [ujson]
 python3-ultralytics-pip:
@@ -1181,6 +1187,8 @@ qt6-base-dev:
     linux: [qt6-main, libopengl-devel, libgl-devel]
     osx: [qt6-main]
     win64: [qt6-main]
+qt6-scxml-dev:
+  robostack: [qt6-scxml]
 qtbase5-dev:
   robostack:
     linux: [qt-main, libopengl-devel, libgl-devel]
@@ -1254,6 +1262,8 @@ tinyxml:
   robostack: [tinyxml]
 tinyxml2:
   robostack: [tinyxml2]
+tl_expected:
+  robostack: [cpp-expected]
 udev:
   robostack:
     linux: [libusb, libudev]
@@ -1286,7 +1296,7 @@ x11-dev:
 xsimd:
   robostack: [xsimd]
 xtensor:
-  robostack: [xtensor ==0.24.7]
+  robostack: [xtensor]
 yaml:
   robostack: [yaml, yaml-cpp]
 yaml-cpp:

@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v0.1.0
+_src_path: gh:Tobias-Fischer/ros-distro-template
+channel_name: robostack-rolling
+distro: rolling
+upload_target: prefix

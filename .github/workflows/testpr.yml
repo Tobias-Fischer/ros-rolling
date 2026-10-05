@@ -15,8 +15,6 @@ env:
   PYTHONIOENCODING: utf-8
   # Change to 'true' to enable the cache upload as artifacts
   SAVE_CACHE_AS_ARTIFACT: 'true'
-  # Change to 'true' to ignore cache and force a full rebuild, but please restore to 'false' before merging
-  IGNORE_CACHE_AND_DO_FULL_REBUILD: 'true'
 
 jobs:
   sort-check:
@@ -150,23 +148,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-${{ matrix.platform }}-pr-${{ github.event.pull_request.number }}-
 
-    - name: Optional force full rebuild
-      if: ${{ env.IGNORE_CACHE_AND_DO_FULL_REBUILD == 'true' }}
+    # Temporary rebuild controls (full rebuild, cache evictions) live in the
+    # distribution-owned ci.yaml, see .github/scripts/ci_config.py.
+    - name: Apply ci.yaml cache controls
       shell: bash -l {0}
       run: |
-        rm -rf ${{ matrix.folder_cache }}/*
-
-    - name: Delete specific outdated cache entries
-      shell: bash -l {0}
-      run: |
-        # Uncomment to force-rebuild a package with a corrupted cache entry.
-        # rm -rf ${{ matrix.folder_cache }}/<package>* 2>/dev/null || true
-        rm -rf ${{ matrix.folder_cache }}/ros2-roboplan* 2>/dev/null || true
-        rm -rf ${{ matrix.folder_cache }}/ros-rolling-roboplan* 2>/dev/null || true
-        rm -rf ${{ matrix.folder_cache }}/ros-rolling-rosidl-generator-py* ${{ matrix.folder_cache }}/ros2-rosidl-generator-py* 2>/dev/null || true
-        rm -rf ${{ matrix.folder_cache }}/ros-rolling-rosidl-core-generators* ${{ matrix.folder_cache }}/ros2-rosidl-core-generators* 2>/dev/null || true
-        rm -rf ${{ matrix.folder_cache }}/ros-rolling-rosidl-default-generators* ${{ matrix.folder_cache }}/ros2-rosidl-default-generators* 2>/dev/null || true
-        rm -rf ${{ matrix.folder_cache }}/ros-rolling-std-msgs* ${{ matrix.folder_cache }}/ros2-std-msgs* 2>/dev/null || true
+        pixi run python .github/scripts/ci_config.py --cache-dir ${{ matrix.folder_cache }}
         mkdir -p ${{ matrix.folder_cache }}
         pixi run rattler-index fs ${{ matrix.folder_cache }}/.. --force
 
@@ -233,6 +220,8 @@ jobs:
     - name: Generate GitHub Actions workflows to catch post-PR problems
       shell: bash -l {0}
       run: |
+        # --batch_size 25 is a workaround for https://github.com/RoboStack/robostack.github.io/issues/105
+        # and keeps the generated workflows below GitHub's 500 KiB limit on all platforms
         pixi run vinca-gha --platform ${{ matrix.platform }} --trigger-branch dummy_build_branch_as_it_is_unused -d ./recipes --batch_size 25
 
     - name: Upload build cache as artifact

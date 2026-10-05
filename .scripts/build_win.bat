@@ -20,9 +20,8 @@ reg add HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /v LongPathsEnabled /t 
 for %%X in (%CURRENT_RECIPES%) do (
     echo "BUILDING RECIPE %%X"
     cd %FEEDSTOCK_ROOT%\recipes\%%X\
-    pixi run -v rattler-build build --recipe %FEEDSTOCK_ROOT%\recipes\%%X\ ^
-        -m %FEEDSTOCK_ROOT%\conda_build_config.yaml ^
-        -c https://prefix.dev/robostack-rolling -c https://prefix.dev/conda-forge ^
+    rem build-ci (pixi.toml) adds the variant config and the channels.
+    pixi run -v build-ci --recipe %FEEDSTOCK_ROOT%\recipes\%%X\ ^
         --output-dir %CONDA_BLD_PATH%
 
     if errorlevel 1 exit 1
@@ -32,11 +31,11 @@ for %%X in (%CURRENT_RECIPES%) do (
 :: Check if .conda files exist in the win-64 directory
 if exist "%CONDA_BLD_PATH%\win-64\*.conda" (
     echo Found .conda files, starting upload...
-    rem Upload packages one-by-one to avoid rattler-upload returning after the first
-    rem package skipped by --skip-existing.
+    rem Upload packages one-by-one; the upload task (pixi.toml) skips or overwrites
+    rem packages that already exist, depending on the upload target.
     for %%F in ("%CONDA_BLD_PATH%\win-64\*.conda") do (
         echo Uploading %%~fF
-        pixi run upload "%%~fF" --skip-existing
+        pixi run upload "%%~fF"
         if errorlevel 1 exit 1
     )
 ) else (
