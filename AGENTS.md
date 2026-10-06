@@ -1,6 +1,11 @@
+<!--
+This file is generated from ros-distro-template (template/AGENTS.md.jinja).
+If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+-->
+
 # AGENTS.md
 
-Working notes for future coding agents in a RoboStack repo. Replace $DISTRO with e.g. noetic/humble/kilted/rolling and so forth; you can check the working directory.
+Working notes for future coding agents in the RoboStack ros-rolling repo. `$DISTRO` below is `rolling`.
 
 ## Session defaults for this repo
 
@@ -169,13 +174,24 @@ Rules:
 - Run parallel lanes only for packages that do not depend on each other.
 - If unsure, serialize the builds.
 
-## Cross-distribution sync
+## Template-owned files (ros-distro-template)
 
-- Work from the clean checked-out heads of rolling, lyrical, kilted, jazzy, and humble; create `codex/cross-distro-sync` in each repo and never merge their independent histories.
-- Classify every candidate before editing: portable shared tooling/CI/metadata, conditional package fix requiring a compatible source and refreshed patch, or excluded distro-owned state.
-- Keep rosdistro snapshots, mutex/build numbers, ABI/compiler/Python pins, channels/upload targets, package selection, generated recipes, and temporary rebuild controls distro-owned.
-- Port patches only for an existing compatible package, using `patch/ros-$DISTRO-<pkg>.patch` and matching recipe wiring; do not copy a patch solely because its filename exists elsewhere.
-- Validate changed patch metadata with `pixi run check-patches` and each changed package with `pixi run build-one ros-$DISTRO-<pkg>`; inspect final diffs for protected state.
+This repository is instantiated from the RoboStack distribution template with
+[copier](https://copier.readthedocs.io); `.copier-answers.yml` records the template
+version and this distribution's answers.
+
+- Template-owned (do not edit here; change the template, robostack-bot then opens
+  an update PR in every distribution): CI workflows, `.scripts/`, `pixi.toml`,
+  `README.md`, `AGENTS.md`, the Python tools and the shared `tests/` smoke tests.
+- Distribution-owned: `vinca.yaml`, `vinca_pinning.yaml`, `robostack.yaml`,
+  `pkg_additional_info.yaml`, `rosdistro_additional_recipes.yaml`,
+  `packages-ignore.yaml`, `ci.yaml`, `patch/`, other `tests/` files, and the generated
+  `rosdistro_snapshot.yaml`, `conda_build_config.yaml` and `pixi.lock`.
+- Re-render after a template change: `pixi exec copier update --trust --defaults`
+  (or comment `@robostack-bot update-from-template` on a PR/issue).
+- Port patches only for an existing compatible package, using
+  `patch/ros-$DISTRO-<pkg>.patch` and matching recipe wiring; do not copy a patch
+  solely because its filename exists in another distribution.
 
 ## Inspect a built conda package
 
@@ -201,11 +217,63 @@ Check:
 
 ## `vinca.yaml` maintenance guidelines
 
+Three distinct ways to exclude a package (vinca revision pinned in `pixi.toml`; re-check `vinca/main.py` + `vinca/resolve.py` if that pin moves):
+
+1. `packages_select_by_deps`, wrapped in `if: not <platform> then: [...]` — the primary way to exclude a package's own recipe. `get_selected_packages` adds every name here to `selected_packages` unconditionally, so simply not listing it for a platform keeps its recipe from being generated.
+2. `packages_skip_by_deps` only affects transitive pull-in (`ignore_pkgs` passed to `distro.get_depends()`). It does not stop a package listed directly in `packages_select_by_deps`.
+3. `packages_remove_from_deps` is checked by `resolve.py::should_skip_pkg` both for a package's own recipe generation and when resolving other packages' host/run dependency names — using it strips both simultaneously, inseparably. Wrong tool if another selected package legitimately needs the dependency; use (1)+(2) instead.
+
 - Add package seeds under `packages_select_by_deps` using ROS package names (dash/underscore accepted).
 - Use platform conditions for Linux-only packages; avoid temporary macOS comment blocks.
 - Keep `packages_skip_by_deps` and `packages_remove_from_deps` coherent with platform constraints.
 - When `build_gap_report.py` shows built artifacts without recipe directories, add those package seeds to `vinca.yaml`.
 - After `vinca.yaml` edits, regenerate recipes before expecting `build_gap_report.py` results to change.
+
+## Check dependency pins before building anything
+
+Incompatible pins (mutex `run_constraints` in `vinca.yaml`, the rendered
+`conda_build_config.yaml`, and what conda-forge actually ships) used to surface only
+after hundreds of packages had been built. `check_dependency_compat.py` finds them up
+front by solving one fake package that requires every non-ROS `host`/`run` dependency
+of the generated recipes plus the mutex constraints; nothing is built.
+
+```bash
+# regenerate recipes, then solve the fake package for the current platform
+pixi run check-deps
+
+# other platforms / options (recipes must already be generated)
+pixi run python check_dependency_compat.py --platform linux-64
+pixi run python check_dependency_compat.py --no-migrations --json conflicts.json
+```
+
+What it reports:
+- `PIN MISMATCH`: a mutex `run_constraints` entry contradicts the rendered pin (e.g. mutex
+  `vtk 9.6.2.*` while `vinca_pinning.yaml` applies `vtk970`). Fix `vinca.yaml` or the
+  migration list; never edit `conda_build_config.yaml` by hand.
+- Per conflicting package: which recipes need it, which pin it clashes with (bisected
+  when it only fails in combination), the solver explanation, and the conda-forge
+  migration status of its feedstock (done / in-pr / awaiting-parents). That status list
+  is the conda-forge to-do list; "no migration" means the feedstock simply needs a rebuild.
+- Exit code 1 when anything conflicts, so it can gate CI.
+
+### Rebuild only the packages built with an outdated pin
+
+```bash
+# local artifacts (output/<platform>) built against pins that no longer match
+pixi run python check_dependency_compat.py --stale
+# only violations of the mutex run_constraints (ignore conda_build_config.yaml drift)
+pixi run python check_dependency_compat.py --stale --mutex-only
+# the published channel
+pixi run python check_dependency_compat.py --stale --repodata https://prefix.dev/robostack-rolling
+# delete the stale local artifacts and re-index; `pixi run build` then rebuilds just those
+pixi run python check_dependency_compat.py --stale --delete
+```
+
+When the stale builds are already on the channel, the report prints a
+`pkg_additional_info.yaml` build-number snippet for exactly those packages plus a
+`mutex_package: build_number:` bump for `vinca.yaml` (so the mutex is re-published with
+the new `run_constraints` while keeping its version), and the `anaconda remove` commands
+for the old files. Only those packages are then regenerated and rebuilt.
 
 ## Local contribution workflow (RoboStack)
 
@@ -216,11 +284,18 @@ pixi run build
 ## Full rebuilds
 For full rebuilds also remember:
 - refresh snapshot: `pixi run create_snapshot`
-- update `conda_build_config.yaml` for active migrations. You can use https://github.com/conda-forge/conda-forge-pinning-feedstock/blob/main/recipe/conda_build_config.yaml as a base, and then also apply migrations that are mostly done; you can check the status at https://conda-forge.org/status/.
+- update the pins: `conda_build_config.yaml` is generated from `vinca_pinning.yaml` (exact
+  `conda-forge-pinning` version + list of applied migrations + local overrides). Run
+  `pixi run vinca-pinning-update --render` to move to the latest pinning and select the
+  migrations that are complete for our dependencies (status: https://conda-forge.org/status/),
+  or edit `vinca_pinning.yaml` and run `pixi run vinca-pinning-render`. Never edit
+  `conda_build_config.yaml` directly.
+- keep `mutex_package.run_constraints` in `vinca.yaml` consistent with the rendered pins
+  and verify with `pixi run check-deps` before starting the rebuild.
 - bump `build_number`
 - bump mutex minor and update hardcoded mutex refs where needed
 - clear stale `pkg_additional_info.yaml` build-number overrides unless intentional
-- remember that in CI there is a build cache, if you fix a problem in an already built package you need to delete the cache for this package in the .github/workflows/testpr.yml under "Delete specific outdated cache entries"
+- remember that in CI there is a build cache: if you fix a problem in an already built package, add it to `evict_cache` in `ci.yaml` (or set `full_rebuild: true` there for a full rebuild), and reset `ci.yaml` once the PR is merged
 
 ## Practical triage order
 

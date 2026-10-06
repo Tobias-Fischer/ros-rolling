@@ -1,0 +1,16 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v0.1.7
+_src_path: gh:Tobias-Fischer/ros-distro-template
+channel_name: robostack-rolling
+conda_forge_migrations:
+- giflib6
+- go_macos
+- gstreamer128
+- hdf52
+- libboost190
+- pybind11_abi11
+- urdfdom6
+- vtk970
+conda_forge_pinning_version: 2026.09.01.16.28.00
+distro: rolling
+upload_target: prefix

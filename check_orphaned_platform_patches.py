@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# This file is generated from ros-distro-template (template/check_orphaned_platform_patches.py).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 """
 check_orphaned_platform_patches.py
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

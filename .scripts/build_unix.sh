@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# This file is generated from ros-distro-template (template/.scripts/build_unix.sh).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 
 # Default values
 target=""
@@ -42,10 +45,9 @@ fi
 
 
 for recipe in ${CURRENT_RECIPES[@]}; do
-	pixi run -v rattler-build build \
+	# build-ci (pixi.toml) adds the variant config and the channels.
+	pixi run -v build-ci \
 		--recipe ${FEEDSTOCK_ROOT}/recipes/${recipe} \
-		-m ${FEEDSTOCK_ROOT}/conda_build_config.yaml \
-		-c https://prefix.dev/robostack-rolling -c https://prefix.dev/conda-forge \
 		${extra_channel} \
 		--output-dir $CONDA_BLD_PATH \
 		${cross_compile}
@@ -57,10 +59,10 @@ done
 shopt -s nullglob
 conda_packages=( "${CONDA_BLD_PATH}/${target}"*/*.conda )
 if (( ${#conda_packages[@]} > 0 )); then
-    # Upload packages one-by-one to avoid rattler-upload returning after the first
-    # package skipped by --skip-existing.
+    # Upload packages one-by-one; the upload task (pixi.toml) skips or overwrites
+    # packages that already exist, depending on the upload target.
     for conda_package in "${conda_packages[@]}"; do
-        pixi run upload "${conda_package}" --skip-existing
+        pixi run upload "${conda_package}"
     done
 else
     echo "Warning: No .conda files found in ${CONDA_BLD_PATH}/${target}"
