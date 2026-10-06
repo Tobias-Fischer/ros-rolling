@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# This file is generated from ros-distro-template (template/.scripts/build_unix.sh).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 
 # Default values
 target=""

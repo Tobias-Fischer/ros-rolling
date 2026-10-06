@@ -1,3 +1,6 @@
+# This file is generated from ros-distro-template (template/.github/workflows/bot.yml.jinja).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 # robostack-bot: routine maintenance for ros-rolling.
 #
 # - weekly: refresh the rosdistro snapshot (PR)

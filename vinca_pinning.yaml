@@ -1,3 +1,13 @@
+# This file is generated from ros-distro-template (template/vinca_pinning.yaml.jinja).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
+# The shared values come from pinning/conda_forge.yaml and pinning/overrides.yaml
+# in the template repository.
+# Shared conda-forge pinning of all distributions, rendered into each
+# distribution's vinca_pinning.yaml (template/vinca_pinning.yaml.jinja).
+# Updated by `robostack-bot update-conda-forge-pinning`; a distribution can stay on
+# an older version with the `conda_forge_pinning_version` /
+# `conda_forge_migrations` copier answers.
 conda_forge_pinning_version: 2026.09.25.23.22.04
 migrations:
   - elfutils0196
@@ -9,6 +19,8 @@ migrations:
   - proj99
   - urdfdom6
   - vtk970
+# Pinning overrides shared by all distributions, rendered into each
+# distribution's vinca_pinning.yaml (template/vinca_pinning.yaml.jinja).
 pinning_overrides:
   # Build commands provide their channels with `-c`, so omit the inherited
   # conda-forge-pinning channel_sources value from the rendered configuration.

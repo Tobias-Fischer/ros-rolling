@@ -1,3 +1,6 @@
+:: This file is generated from ros-distro-template (template/.scripts/build_win.bat).
+:: If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 setlocal EnableExtensions EnableDelayedExpansion
 
 set CONDA_BLD_PATH=C:\bld

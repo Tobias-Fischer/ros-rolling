@@ -1,3 +1,8 @@
+<!--
+This file is generated from ros-distro-template (template/AGENTS.md.jinja).
+If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+-->
+
 # AGENTS.md
 
 Working notes for future coding agents in the RoboStack ros-rolling repo. `$DISTRO` below is `rolling`.
