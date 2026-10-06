@@ -1,3 +1,6 @@
+# This file is generated from ros-distro-template (template/tests/ros2-tf2-ros/static_transform_publisher_smoke_test_launch.py).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 import sys
 
 from launch import LaunchDescription

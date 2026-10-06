@@ -1,3 +1,6 @@
+# This file is generated from ros-distro-template (template/.github/scripts/ci_config.py).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 """Apply the PR-build cache controls from the distribution-owned ci.yaml.
 
 testpr.yml restores the build cache of the pull request and then runs this

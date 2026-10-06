@@ -1,6 +1,7 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.1.4
+_commit: v0.1.7
 _src_path: gh:Tobias-Fischer/ros-distro-template
 channel_name: robostack-rolling
+conda_forge_pinning_version: ''
 distro: rolling
 upload_target: prefix

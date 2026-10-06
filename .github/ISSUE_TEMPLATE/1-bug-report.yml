@@ -1,3 +1,6 @@
+# This file is generated from ros-distro-template (template/.github/ISSUE_TEMPLATE/1-bug-report.yml).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 name: Bug report
 description: Report a bug.
 labels: bug

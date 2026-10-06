@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# This file is generated from ros-distro-template (template/check_dependency_compat.py).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 """Detect incompatible dependency pins before (or after) building ROS packages.
 
 Three modes, all platform-agnostic (default platform: the current machine):

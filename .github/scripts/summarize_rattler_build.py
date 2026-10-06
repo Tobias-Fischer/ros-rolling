@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# This file is generated from ros-distro-template (template/.github/scripts/summarize_rattler_build.py).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 """Write a compact rattler-build diagnostic for the GitHub job summary."""
 
 from __future__ import annotations
