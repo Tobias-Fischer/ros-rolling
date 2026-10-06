@@ -1,0 +1,11 @@
+# This file is generated from ros-distro-template (template/tests/ros2-rosx-introspection.yaml).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
+tests:
+  - script:
+    - cmake-package-check rosx_introspection --targets rosx_introspection::rosx_introspection
+    requirements:
+      run:
+        - cmake-package-check
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}

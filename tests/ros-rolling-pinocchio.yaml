@@ -1,8 +1,0 @@
-tests:
-  - script:
-    - cmake-package-check pinocchio --targets pinocchio::pinocchio
-    requirements:
-      run:
-        - cmake-package-check
-        - ${{ compiler('c') }}
-        - ${{ compiler('cxx') }}

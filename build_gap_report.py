@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# This file is generated from ros-distro-template (template/build_gap_report.py).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
 """Report gaps between generated recipes and built conda artifacts.
 
 Default behavior is platform-agnostic: it inspects all output/<platform> folders that

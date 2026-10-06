@@ -1,0 +1,13 @@
+# This file is generated from ros-distro-template (template/tests/ros2-steering-controllers-library.yaml).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
+tests:
+  - script:
+    - cmake-package-check steering_controllers_library --targets steering_controllers_library::steering_controllers_library
+    requirements:
+      run:
+        - cmake-package-check
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
+        # workaround for https://github.com/ros-controls/ros2_controllers/pull/1463
+        - ros2-generate-parameter-library

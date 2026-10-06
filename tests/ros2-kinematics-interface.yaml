@@ -1,0 +1,11 @@
+# This file is generated from ros-distro-template (template/tests/ros2-kinematics-interface.yaml).
+# If you change it here, upstream the change: comment `@robostack-bot upstream-to-template` on your PR.
+
+tests:
+  - script:
+    - cmake-package-check kinematics_interface --targets kinematics_interface::kinematics_interface
+    requirements:
+      run:
+        - cmake-package-check
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
